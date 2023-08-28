@@ -5,12 +5,15 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import DSCatolog.DTO.CategoryDTO;
 import DSCatolog.entities.Category;
 import DSCatolog.repositories.CategoryRepository;
+import DSCatolog.services.exception.DatabaseException;
 import DSCatolog.services.exception.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -56,6 +59,19 @@ public class CategoryService {
 
 	public void copyDtoToEntity(CategoryDTO dto, Category entity) {
 		entity.setName(dto.getName());
+	}
+
+	@Transactional(propagation = Propagation.SUPPORTS)
+	public void delete(Long id) {
+		if (!repository.existsById(id)) {
+			throw new ResourceNotFoundException("Recurso não encontrado");
+		}
+		try {
+	        	repository.deleteById(id);    		
+		}
+	    	catch (DataIntegrityViolationException e) {
+	        	throw new DatabaseException("Falha de integridade referencial");
+	   	}
 	}
 
 }
