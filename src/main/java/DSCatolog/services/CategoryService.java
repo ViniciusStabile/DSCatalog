@@ -35,5 +35,18 @@ public class CategoryService {
 		return new CategoryDTO(entity);
 		
 	}
+
+
+	public CategoryDTO insert(CategoryDTO dto) {
+		Category entity = new Category();
+		copyDtoToEntity(dto,entity);
+		entity = repository.save(entity);
+		return new CategoryDTO(entity);
+	}
+	
+	
+	public void copyDtoToEntity(CategoryDTO dto, Category entity) {
+		entity.setName(dto.getName());
+	}
 	
 }
