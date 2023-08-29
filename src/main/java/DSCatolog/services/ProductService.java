@@ -10,8 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import DSCatolog.DTO.CategoryDTO;
 import DSCatolog.DTO.ProductDTO;
+import DSCatolog.entities.Category;
 import DSCatolog.entities.Product;
+import DSCatolog.repositories.CategoryRepository;
 import DSCatolog.repositories.ProductRepository;
 import DSCatolog.services.exception.DatabaseException;
 import DSCatolog.services.exception.ResourceNotFoundException;
@@ -22,6 +25,9 @@ public class ProductService {
 
 	@Autowired
 	private ProductRepository repository;
+
+	@Autowired
+	private CategoryRepository CategoryRepository;
 
 	@Transactional(readOnly = true)
 	public Page<ProductDTO> findAll(Pageable page) {
@@ -34,10 +40,11 @@ public class ProductService {
 	public ProductDTO findById(Long id) {
 		Optional<Product> obj = repository.findById(id);
 		Product entity = obj.orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
-		return new ProductDTO(entity,entity.getCategories());
+		return new ProductDTO(entity, entity.getCategories());
 
 	}
 
+	@Transactional
 	public ProductDTO insert(ProductDTO dto) {
 		Product entity = new Product();
 		copyDtoToEntity(dto, entity);
@@ -49,7 +56,7 @@ public class ProductService {
 	public ProductDTO update(Long id, ProductDTO dto) {
 		try {
 			Product entity = repository.getReferenceById(id);
-			copyDtoToEntity(dto,entity);
+			copyDtoToEntity(dto, entity);
 			entity = repository.save(entity);
 			return new ProductDTO(entity);
 		} catch (EntityNotFoundException e) {
@@ -63,6 +70,11 @@ public class ProductService {
 		entity.setPrice(dto.getPrice());
 		entity.setImgUrl(dto.getImgUrl());
 		entity.setDate(dto.getdate());
+		entity.getCategories().clear();
+		for (CategoryDTO catDto : dto.getCategories()) {
+			Category cat = CategoryRepository.getReferenceById(catDto.getId());
+			entity.getCategories().add(cat);
+		}
 	}
 
 	@Transactional(propagation = Propagation.SUPPORTS)
