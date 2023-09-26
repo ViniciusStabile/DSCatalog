@@ -8,16 +8,30 @@ import java.util.Set;
 
 import DSCatolog.entities.Category;
 import DSCatolog.entities.Product;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 public class ProductDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	private Long id;
+	
+	@Size(min = 2, message = "Minimum 2 characters" )
+	@NotBlank(message = "Required field")
 	private String name;
+	
+	@Size(min = 2, message = "Minimum 2 characters" )
+	@NotBlank(message = "Required field")
 	private String description;
+	
+	@Positive(message = "put positive value")
 	private Double price;
 	private String imgUrl;
+	
+	@PastOrPresent(message = "invalid date")
 	private Instant date;
 
 	private List<CategoryDTO> categories = new ArrayList<>();

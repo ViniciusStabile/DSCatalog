@@ -6,15 +6,28 @@ import java.util.Set;
 
 import DSCatolog.entities.Role;
 import DSCatolog.entities.User;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public class UserDTO implements Serializable {
 
 	
 	private static final long serialVersionUID = 1L;
 
+	
 	private Long id;
+	
+	@Size(min = 2, message = "Minimum 2 characters" )
+	@NotBlank(message = "Required field")
 	private String firstName;
+	
+	@Size(min = 2, message = "Minimum 2 characters" )
+	@NotBlank(message = "Required field")
 	private String lastName;
+	
+	@NotBlank(message = "Required field")
+	@Email(message = "Invalid imail")
 	private String email;
 	
 	Set<RoleDTO> roles = new HashSet<>();
