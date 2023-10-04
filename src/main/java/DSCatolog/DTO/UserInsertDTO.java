@@ -1,5 +1,8 @@
 package DSCatolog.DTO;
 
+import DSCatolog.services.validation.UserInsertValid;
+
+@UserInsertValid
 public class UserInsertDTO extends UserDTO{
 
 	
