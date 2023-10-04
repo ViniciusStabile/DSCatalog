@@ -1,4 +1,4 @@
-package DSCatolog.services;
+package DSCatolog.services.validation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,6 @@ import DSCatolog.DTO.UserInsertDTO;
 import DSCatolog.entities.User;
 import DSCatolog.repositories.UserRepository;
 import DSCatolog.resources.exception.FieldMessage;
-import DSCatolog.services.validation.UserInsertValid;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
