@@ -1,11 +1,15 @@
 package DSCatolog.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -17,6 +21,7 @@ import DSCatolog.DTO.UserInsertDTO;
 import DSCatolog.DTO.UserUpdateDTO;
 import DSCatolog.entities.Role;
 import DSCatolog.entities.User;
+import DSCatolog.projections.UserDetailsProjection;
 import DSCatolog.repositories.RoleRepository;
 import DSCatolog.repositories.UserRepository;
 import DSCatolog.services.exception.DatabaseException;
@@ -24,17 +29,16 @@ import DSCatolog.services.exception.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
-	
+
 	@Autowired
 	private UserRepository repository;
-	
+
 	@Autowired
 	private RoleRepository roleRepository;
-
 
 	@Transactional(readOnly = true)
 	public Page<UserDTO> findAll(Pageable page) {
@@ -94,6 +98,23 @@ public class UserService {
 		} catch (DataIntegrityViolationException e) {
 			throw new DatabaseException("Falha de integridade referencial");
 		}
+	}
+
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		List<UserDetailsProjection> result = repository.searchUserAndRolesByEmail(username);
+		if (result.size() == 0) {
+			throw new UsernameNotFoundException("User not found");
+		}
+
+		User user = new User();
+		user.setEmail(username);
+		user.setPassword(result.get(0).getPassword());
+		for (UserDetailsProjection projection : result) {
+			user.addRole(new Role(projection.getRoleId(), projection.getAuthority()));
+		}
+
+		return user;
 	}
 
 }
