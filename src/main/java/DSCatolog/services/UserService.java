@@ -31,8 +31,7 @@ import jakarta.persistence.EntityNotFoundException;
 @Service
 public class UserService implements UserDetailsService {
 
-	@Autowired
-	private BCryptPasswordEncoder passwordEncoder;
+	
 
 	@Autowired
 	private UserRepository repository;
@@ -59,7 +58,7 @@ public class UserService implements UserDetailsService {
 	public UserDTO insert(UserInsertDTO dto) {
 		User entity = new User();
 		copyDtoToEntity(dto, entity);
-		entity.setPassword(passwordEncoder.encode(dto.getPassword()));
+		entity.setPassword(dto.getPassword());
 		entity = repository.save(entity);
 		return new UserDTO(entity);
 	}
